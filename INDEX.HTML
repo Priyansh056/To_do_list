@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Document</title>
+</head>
+<body>
+    <h1 id="hello"></h1>
+    <p>Lorem ipsum doljor sit amet consectetur adipisicing elit. Labore, sapiente commodi. Esse libero eaque explicabo facere corporis veniam modi aliquid illo quod, voluptatem recusandae amet enim iste, consectetur, corrupti exercitationem!</p>
+    <button id="button">Click me</button>
+    <script>
+        const button = document.getElementById("button");
+        
+        button.addEventListener("click", () => {
+            for (let i = 0; i < 1000; i++) {
+                const el = document.createElement("h1");
+                el.innerText = "";
+                document.body.appendChild(el); // Append the new h1 to the body
+            }
+        });
+    </script>
+</body>
+</html>
