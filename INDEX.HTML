@@ -1,22 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colorful To-Do App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(to right, #ffc3c3, #fcab97, #abdeda, #63837f);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #ffffffcc;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #63837f;
+      margin-top: 30px;
+      border-bottom: 2px solid #63837f;
+      padding-bottom: 5px;
+    }
+
+    input[type="text"] {
+      width: 70%;
+      padding: 10px;
+      border: 2px solid #fcab97;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    button {
+      padding: 10px 15px;
+      background-color: #63837f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #4e6c67;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      margin: 10px 0;
+      background: #abdeda;
+      padding: 10px;
+      border-left: 5px solid #63837f;
+      border-radius: 4px;
+    }
+
+    .done {
+      text-decoration: line-through;
+      color: gray;
+      background: #e0e0e0;
+      border-left: 5px solid #aaa;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      height: 120px;
+      border: 2px solid #fcab97;
+      border-radius: 5px;
+      resize: vertical;
+      font-family: Arial, sans-serif;
+    }
+  </style>
 </head>
 <body>
-    <h1 id="hello"></h1>
-    <p>Lorem ipsum doljor sit amet consectetur adipisicing elit. Labore, sapiente commodi. Esse libero eaque explicabo facere corporis veniam modi aliquid illo quod, voluptatem recusandae amet enim iste, consectetur, corrupti exercitationem!</p>
-    <button id="button">Click me</button>
-    <script>
-        const button = document.getElementById("button");
-        
-        button.addEventListener("click", () => {
-            for (let i = 0; i < 1000; i++) {
-                const el = document.createElement("h1");
-                el.innerText = "";
-                document.body.appendChild(el); // Append the new h1 to the body
-            }
-        });
-    </script>
+
+<div class="container">
+  <h2>📝 To-Do List</h2>
+  <input type="text" id="taskInput" placeholder="Enter a task..." />
+  <button onclick="addTask()">Add Task</button>
+  <ul id="taskList"></ul>
+
+  <h2>🗒️ Notes</h2>
+  <textarea placeholder="Write your notes here..."></textarea>
+
+  <h2>🔔 Remember</h2>
+  <textarea placeholder="Things to remember..."></textarea>
+</div>
+
+<script>
+  function addTask() {
+    const input = document.getElementById("taskInput");
+    const taskText = input.value.trim();
+    if (taskText === "") return;
+
+    const li = document.createElement("li");
+    li.innerHTML = `<input type="checkbox" onchange="toggleDone(this)"> ${taskText}`;
+    document.getElementById("taskList").appendChild(li);
+
+    input.value = "";
+  }
+
+  function toggleDone(checkbox) {
+    const li = checkbox.parentElement;
+    if (checkbox.checked) {
+      li.classList.add("done");
+    } else {
+      li.classList.remove("done");
+    }
+  }
+</script>
+
 </body>
 </html>
