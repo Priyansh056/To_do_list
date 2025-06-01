@@ -100,13 +100,38 @@
   <ul id="taskList"></ul>
 
   <h2>🗒️ Notes</h2>
-  <textarea placeholder="Write your notes here..."></textarea>
+  <textarea id="notesArea" placeholder="Write your notes here..."></textarea>
 
   <h2>🔔 Remember</h2>
-  <textarea placeholder="Things to remember..."></textarea>
+  <textarea id="rememberArea" placeholder="Things to remember..."></textarea>
 </div>
 
 <script>
+  // Load from localStorage on page load
+  window.onload = function () {
+    // Load notes
+    document.getElementById("notesArea").value = localStorage.getItem("notes") || "";
+    document.getElementById("rememberArea").value = localStorage.getItem("remember") || "";
+
+    // Load tasks
+    const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    savedTasks.forEach(task => {
+      const li = document.createElement("li");
+      li.innerHTML = `<input type="checkbox" onchange="toggleDone(this)" ${task.done ? "checked" : ""}> ${task.text}`;
+      if (task.done) li.classList.add("done");
+      document.getElementById("taskList").appendChild(li);
+    });
+  };
+
+  // Save notes on typing
+  document.getElementById("notesArea").addEventListener("input", function () {
+    localStorage.setItem("notes", this.value);
+  });
+
+  document.getElementById("rememberArea").addEventListener("input", function () {
+    localStorage.setItem("remember", this.value);
+  });
+
   function addTask() {
     const input = document.getElementById("taskInput");
     const taskText = input.value.trim();
@@ -115,17 +140,25 @@
     const li = document.createElement("li");
     li.innerHTML = `<input type="checkbox" onchange="toggleDone(this)"> ${taskText}`;
     document.getElementById("taskList").appendChild(li);
-
     input.value = "";
+
+    saveTasks(); // Save new task
   }
 
   function toggleDone(checkbox) {
     const li = checkbox.parentElement;
-    if (checkbox.checked) {
-      li.classList.add("done");
-    } else {
-      li.classList.remove("done");
-    }
+    li.classList.toggle("done", checkbox.checked);
+    saveTasks(); // Save updated status
+  }
+
+  function saveTasks() {
+    const tasks = [];
+    document.querySelectorAll("#taskList li").forEach(li => {
+      const text = li.textContent.trim();
+      const done = li.querySelector("input[type='checkbox']").checked;
+      tasks.push({ text, done });
+    });
+    localStorage.setItem("tasks", JSON.stringify(tasks));
   }
 </script>
 
