@@ -2,166 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Colorful To-Do App</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: linear-gradient(to right, #ffc3c3, #fcab97, #abdeda, #63837f);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: #ffffffcc;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      color: #63837f;
-      margin-top: 30px;
-      border-bottom: 2px solid #63837f;
-      padding-bottom: 5px;
-    }
-
-    input[type="text"] {
-      width: 70%;
-      padding: 10px;
-      border: 2px solid #fcab97;
-      border-radius: 5px;
-      outline: none;
-    }
-
-    button {
-      padding: 10px 15px;
-      background-color: #63837f;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      margin-left: 10px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #4e6c67;
-    }
-
-    ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    li {
-      margin: 10px 0;
-      background: #abdeda;
-      padding: 10px;
-      border-left: 5px solid #63837f;
-      border-radius: 4px;
-    }
-
-    .done {
-      text-decoration: line-through;
-      color: gray;
-      background: #e0e0e0;
-      border-left: 5px solid #aaa;
-    }
-
-    textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      margin-bottom: 20px;
-      height: 120px;
-      border: 2px solid #fcab97;
-      border-radius: 5px;
-      resize: vertical;
-      font-family: Arial, sans-serif;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TypeFlow - Modern Typing Practice</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div class="container">
+    <div class="header">
+      <h1>TypeFlow</h1>
+      <p>Master your typing skills with style</p>
+    </div>
 
+    <div class="typing-area">
+      <div class="quote-category" id="quoteCategory">Practice Quote</div>
+      <div id="quoteDisplay"></div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <textarea id="quoteInput" placeholder="Click here and start typing..."></textarea>
+    </div>
 
-<div class="container">
-  <h2>📝 To-Do List</h2>
-  <input type="text" id="taskInput" placeholder="Enter a task..." />
-  <button onclick="addTask()">Add Task</button>
-  <ul id="taskList"></ul>
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-label">Speed</div>
+        <div class="stat-value" id="wpm">0</div>
+        <div class="stat-unit">WPM</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Accuracy</div>
+        <div class="stat-value" id="accuracy">100</div>
+        <div class="stat-unit">%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Time</div>
+        <div class="stat-value" id="timer">0</div>
+        <div class="stat-unit">sec</div>
+      </div>
+    </div>
 
-  <h2>🗒️ Notes</h2>
-  <textarea id="notesArea" placeholder="Write your notes here..."></textarea>
+    <div class="controls">
+      <button class="btn btn-primary" onclick="renderNewQuote()">New Quote</button>
+      <button class="btn btn-secondary" onclick="resetTest()">Reset</button>
+    </div>
+  </div>
 
-  <h2>🔔 Remember</h2>
-  <textarea id="rememberArea" placeholder="Things to remember..."></textarea>
-</div>
-
-<script>
-  // Load from localStorage on page load
-  window.onload = function () {
-    // Load notes
-    document.getElementById("notesArea").value = localStorage.getItem("notes") || "";
-    document.getElementById("rememberArea").value = localStorage.getItem("remember") || "";
-
-    // Load tasks
-    const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    savedTasks.forEach(task => {
-      const li = document.createElement("li");
-      li.innerHTML = `<input type="checkbox" onchange="toggleDone(this)" ${task.done ? "checked" : ""}> ${task.text}`;
-      if (task.done) li.classList.add("done");
-      document.getElementById("taskList").appendChild(li);
-    });
-  };
-
-  // Save notes on typing
-  document.getElementById("notesArea").addEventListener("input", function () {
-    localStorage.setItem("notes", this.value);
-  });
-
-  document.getElementById("rememberArea").addEventListener("input", function () {
-    localStorage.setItem("remember", this.value);
-  });
-
-  function addTask() {
-    const input = document.getElementById("taskInput");
-    const taskText = input.value.trim();
-    if (taskText === "") return;
-
-    const li = document.createElement("li");
-    li.innerHTML = `<input type="checkbox" onchange="toggleDone(this)"> ${taskText}`;
-    document.getElementById("taskList").appendChild(li);
-    input.value = "";
-
-    saveTasks(); // Save new task
-  }
-
-  function toggleDone(checkbox) {
-    const li = checkbox.parentElement;
-    li.classList.toggle("done", checkbox.checked);
-    saveTasks(); // Save updated status
-  }
-
-  function saveTasks() {
-    const tasks = [];
-    document.querySelectorAll("#taskList li").forEach(li => {
-      const text = li.textContent.trim();
-      const done = li.querySelector("input[type='checkbox']").checked;
-      tasks.push({ text, done });
-    });
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
+   
+   
