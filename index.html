@@ -1,54 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TypeFlow - Modern Typing Practice</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>BusTrack Demo</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>TypeFlow</h1>
-      <p>Master your typing skills with style</p>
-    </div>
+  <h2>🚌 Bus Schedule Finder (Demo)</h2>
 
-    <div class="typing-area">
-      <div class="quote-category" id="quoteCategory">Practice Quote</div>
-      <div id="quoteDisplay"></div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-      <textarea id="quoteInput" placeholder="Click here and start typing..."></textarea>
-    </div>
+  <label>From:</label><br>
+  <input type="text" id="from" placeholder="e.g., Bhopal"><br>
 
-    <div class="stats-container">
-      <div class="stat-card">
-        <div class="stat-label">Speed</div>
-        <div class="stat-value" id="wpm">0</div>
-        <div class="stat-unit">WPM</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Accuracy</div>
-        <div class="stat-value" id="accuracy">100</div>
-        <div class="stat-unit">%</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Time</div>
-        <div class="stat-value" id="timer">0</div>
-        <div class="stat-unit">sec</div>
-      </div>
-    </div>
+  <label>To:</label><br>
+  <input type="text" id="to" placeholder="e.g., Indore"><br>
 
-    <div class="controls">
-      <button class="btn btn-primary" onclick="renderNewQuote()">New Quote</button>
-      <button class="btn btn-secondary" onclick="resetTest()">Reset</button>
-    </div>
-  </div>
+  <button onclick="findBus()">🔍 Search</button>
 
-  <script src="script.js"></script>
+  <div id="output"></div>
+
+  <script src="app.js"></script>
 </body>
 </html>
-   
-   
