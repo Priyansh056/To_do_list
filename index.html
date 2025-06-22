@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+1<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -373,5 +373,430 @@
             </div>
         </div>
     </div>
-
+<script>
+        class MultiUserChat {
+            constructor() {
+                this.currentUser = null;
+                this.currentRoom = 'general';
+                this.messages = [];
+                this.users = new Map();
+                this.typingUsers = new Set();
+                this.maxMessages = 1000;
+                this.messageId = 1;
+                
+                this.initElements();
+                this.bindEvents();
+                this.simulateServerConnection();
+                this.loadPersistentData();
+            }
+            
+            initElements() {
+                this.joinForm = document.getElementById('joinForm');
+                this.chatMain = document.getElementById('chatMain');
+                this.nameInput = document.getElementById('nameInput');
+                this.roomInput = document.getElementById('roomInput');
+                this.joinBtn = document.getElementById('joinBtn');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.messagesContainer = document.getElementById('messagesContainer');
+                this.onlineCount = document.getElementById('onlineCount');
+                this.messageCount = document.getElementById('messageCount');
+                this.usersList = document.getElementById('usersList');
+                this.connectionStatus = document.getElementById('connectionStatus');
+                this.typingIndicator = document.getElementById('typingIndicator');
+            }
+            
+            bindEvents() {
+                // Add debug logging
+                console.log('Binding events...');
+                
+                this.joinBtn.addEventListener('click', (e) => {
+                    console.log('Join button clicked');
+                    e.preventDefault();
+                    this.joinChat();
+                });
+                
+                this.nameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.roomInput.focus();
+                    }
+                });
+                
+                this.roomInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.joinChat();
+                    }
+                });
+                
+                this.sendBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.sendMessage();
+                });
+                
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+                
+                this.messageInput.addEventListener('input', () => this.handleTyping());
+                
+                console.log('Events bound successfully');
+            }
+            
+            loadPersistentData() {
+                // Simulate loading existing messages and users
+                const sampleMessages = [
+                    {
+                        id: this.messageId++,
+                        text: "Welcome to the conference chat! Feel free to introduce yourself.",
+                        author: "System Admin",
+                        authorId: "admin",
+                        timestamp: new Date(Date.now() - 300000),
+                        room: this.currentRoom,
+                        own: false
+                    },
+                    {
+                        id: this.messageId++,
+                        text: "Hi everyone! Excited to be here for the conference.",
+                        author: "Sarah Johnson",
+                        authorId: "sarah_j",
+                        timestamp: new Date(Date.now() - 240000),
+                        room: this.currentRoom,
+                        own: false
+                    },
+                    {
+                        id: this.messageId++,
+                        text: "Great turnout today! Looking forward to the sessions.",
+                        author: "Mike Chen",
+                        authorId: "mike_c",
+                        timestamp: new Date(Date.now() - 180000),
+                        room: this.currentRoom,
+                        own: false
+                    }
+                ];
+                
+                this.messages = sampleMessages;
+                
+                // Add sample users
+                this.users.set("sarah_j", { name: "Sarah Johnson", joinedAt: new Date(Date.now() - 300000), active: true });
+                this.users.set("mike_c", { name: "Mike Chen", joinedAt: new Date(Date.now() - 250000), active: true });
+                this.users.set("admin", { name: "System Admin", joinedAt: new Date(Date.now() - 400000), active: true });
+                
+                this.updateStats();
+            }
+            
+            simulateServerConnection() {
+                // Simulate connection to server
+                setTimeout(() => {
+                    this.connectionStatus.innerHTML = '🟢 Connected to server';
+                }, 1000);
+                
+                // Simulate periodic new users joining
+                setInterval(() => {
+                    if (Math.random() < 0.2) {
+                        this.simulateUserJoin();
+                    }
+                }, 15000);
+                
+                // Simulate random messages from other users
+                setInterval(() => {
+                    if (Math.random() < 0.3 && this.currentUser) {
+                        this.simulateRandomMessage();
+                    }
+                }, 8000);
+            }
+            
+            joinChat() {
+                console.log('joinChat called');
+                const name = this.nameInput.value.trim();
+                const room = this.roomInput.value.trim() || 'general';
+                
+                console.log('Name:', name, 'Room:', room);
+                
+                if (!name) {
+                    alert('Please enter your name');
+                    this.nameInput.focus();
+                    return;
+                }
+                
+                if (name.length < 2) {
+                    alert('Name must be at least 2 characters');
+                    this.nameInput.focus();
+                    return;
+                }
+                
+                this.currentUser = {
+                    name: name,
+                    id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    joinedAt: new Date(),
+                    room: room
+                };
+                
+                console.log('User created:', this.currentUser);
+                
+                this.currentRoom = room;
+                this.users.set(this.currentUser.id, {
+                    name: this.currentUser.name,
+                    joinedAt: this.currentUser.joinedAt,
+                    active: true
+                });
+                
+                console.log('Hiding join form, showing chat');
+                this.joinForm.style.display = 'none';
+                this.chatMain.classList.add('active');
+                
+                // Wait a bit then focus
+                setTimeout(() => {
+                    if (this.messageInput) {
+                        this.messageInput.focus();
+                    }
+                }, 100);
+                
+                // Load existing messages for this user
+                this.renderAllMessages();
+                this.addSystemMessage(`${this.currentUser.name} joined the chat room: ${room}`);
+                this.updateStats();
+                this.updateUsersList();
+                
+                console.log('Join process completed');
+            }
+            
+            sendMessage() {
+                const text = this.messageInput.value.trim();
+                if (!text) return;
+                
+                const message = {
+                    id: this.messageId++,
+                    text: text,
+                    author: this.currentUser.name,
+                    authorId: this.currentUser.id,
+                    timestamp: new Date(),
+                    room: this.currentRoom,
+                    own: true
+                };
+                
+                this.addMessageToStore(message);
+                this.addMessageToDOM(message);
+                this.messageInput.value = '';
+                this.updateStats();
+                
+                // Simulate message broadcast to other users
+                this.simulateMessageResponse(text);
+            }
+            
+            addMessageToStore(message) {
+                this.messages.push(message);
+                
+                // Keep only last 1000 messages
+                if (this.messages.length > this.maxMessages) {
+                    const removed = this.messages.splice(0, this.messages.length - this.maxMessages);
+                    console.log(`Removed ${removed.length} old messages. Keeping last ${this.maxMessages} messages.`);
+                }
+            }
+            
+            renderAllMessages() {
+                this.messagesContainer.innerHTML = '<div class="message-count">Loading previous messages...</div>';
+                
+                setTimeout(() => {
+                    this.messagesContainer.innerHTML = '';
+                    
+                    // Show message count info
+                    const countInfo = document.createElement('div');
+                    countInfo.className = 'message-count';
+                    countInfo.textContent = `Showing ${this.messages.length} messages (max 1000 stored)`;
+                    this.messagesContainer.appendChild(countInfo);
+                    
+                    this.messages.forEach(message => {
+                        this.addMessageToDOM(message);
+                    });
+                    
+                    this.scrollToBottom();
+                }, 500);
+            }
+            
+            addMessageToDOM(message) {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${message.own ? 'own' : ''}`;
+                messageEl.dataset.messageId = message.id;
+                
+                messageEl.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-author">${this.escapeHtml(message.author)}</span>
+                        <span class="message-time">${this.formatTime(message.timestamp)}</span>
+                    </div>
+                    <div class="message-bubble">${this.escapeHtml(message.text)}</div>
+                `;
+                
+                this.messagesContainer.appendChild(messageEl);
+                this.scrollToBottom();
+            }
+            
+            addSystemMessage(text) {
+                const messageEl = document.createElement('div');
+                messageEl.className = 'system-message';
+                messageEl.textContent = text;
+                this.messagesContainer.appendChild(messageEl);
+                this.scrollToBottom();
+            }
+            
+            simulateUserJoin() {
+                const names = ['Alex Rivera', 'Emma Watson', 'David Kim', 'Lisa Zhang', 'James Wilson', 'Ana Garcia'];
+                const randomName = names[Math.floor(Math.random() * names.length)];
+                
+                const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                this.users.set(userId, {
+                    name: randomName,
+                    joinedAt: new Date(),
+                    active: true
+                });
+                
+                this.addSystemMessage(`${randomName} joined the chat`);
+                this.updateStats();
+                this.updateUsersList();
+            }
+            
+            simulateRandomMessage() {
+                const activeUsers = Array.from(this.users.entries())
+                    .filter(([id, user]) => user.active && id !== this.currentUser?.id)
+                    .filter(([id, user]) => user.name !== 'System Admin');
+                
+                if (activeUsers.length === 0) return;
+                
+                const [userId, user] = activeUsers[Math.floor(Math.random() * activeUsers.length)];
+                
+                const casualMessages = [
+                    "Thanks for the great insights everyone!",
+                    "Really enjoying this discussion 👍",
+                    "Has anyone tried the networking app?",
+                    "Looking forward to the next session",
+                    "Great points being made here",
+                    "This conference is fantastic!",
+                    "Anyone else taking notes? 📝",
+                    "The speakers have been amazing",
+                    "Love the interactive format",
+                    "What did everyone think of the last talk?",
+                    "Coffee break was much needed ☕",
+                    "Who else is staying for the evening event?",
+                    "The venue is incredible!",
+                    "Met some amazing people today",
+                    "This chat is so helpful for staying connected"
+                ];
+                
+                const message = {
+                    id: this.messageId++,
+                    text: casualMessages[Math.floor(Math.random() * casualMessages.length)],
+                    author: user.name,
+                    authorId: userId,
+                    timestamp: new Date(),
+                    room: this.currentRoom,
+                    own: false
+                };
+                
+                this.addMessageToStore(message);
+                this.addMessageToDOM(message);
+                this.updateStats();
+            }
+            
+            simulateMessageResponse(userMessage) {
+                // Simulate someone responding to user's message
+                setTimeout(() => {
+                    const activeUsers = Array.from(this.users.entries())
+                        .filter(([id, user]) => user.active && id !== this.currentUser?.id)
+                        .filter(([id, user]) => user.name !== 'System Admin');
+                    
+                    if (activeUsers.length === 0) return;
+                    
+                    const [userId, user] = activeUsers[Math.floor(Math.random() * activeUsers.length)];
+                    
+                    const responses = [
+                        "That's a great point!",
+                        "I completely agree with that",
+                        "Thanks for sharing that insight",
+                        "Really interesting perspective",
+                        "I hadn't thought of it that way",
+                        "Absolutely! 💯",
+                        "Could you elaborate on that?",
+                        "That's exactly what I was thinking",
+                        "Great question!",
+                        "Very insightful, thanks!"
+                    ];
+                    
+                    const response = {
+                        id: this.messageId++,
+                        text: responses[Math.floor(Math.random() * responses.length)],
+                        author: user.name,
+                        authorId: userId,
+                        timestamp: new Date(),
+                        room: this.currentRoom,
+                        own: false
+                    };
+                    
+                    this.addMessageToStore(response);
+                    this.addMessageToDOM(response);
+                    this.updateStats();
+                }, 1000 + Math.random() * 3000);
+            }
+            
+            updateUsersList() {
+                this.usersList.innerHTML = '';
+                
+                const sortedUsers = Array.from(this.users.entries())
+                    .sort((a, b) => b[1].joinedAt - a[1].joinedAt);
+                
+                sortedUsers.forEach(([id, user]) => {
+                    const userEl = document.createElement('div');
+                    userEl.className = 'user-item';
+                    userEl.innerHTML = `
+                        <div class="user-status"></div>
+                        <span>${this.escapeHtml(user.name)}</span>
+                    `;
+                    this.usersList.appendChild(userEl);
+                });
+            }
+            
+            updateStats() {
+                this.onlineCount.textContent = `${this.users.size} users online`;
+                this.messageCount.textContent = `${this.messages.length}/1000 messages`;
+            }
+            
+            handleTyping() {
+                // In a real implementation, this would notify other users
+                clearTimeout(this.typingTimeout);
+                this.typingTimeout = setTimeout(() => {
+                    // Stop showing typing indicator
+                }, 1000);
+            }
+            
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+                }, 100);
+            }
+            
+            formatTime(date) {
+                return date.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+        
+        // Initialize the multi-user chat
+        document.addEventListener('DOMContentLoaded', () => {
+            new MultiUserChat();
+        });
+    </script>
+</body>
+</html>
     
