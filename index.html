@@ -1,9 +1,9 @@
-1<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conference Chat - Multi User</title>
+    <title>Group Chat - Chat with Everyone</title>
     <style>
         * {
             margin: 0;
@@ -12,168 +12,55 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
         }
 
         .chat-container {
             width: 95%;
-            max-width: 900px;
+            max-width: 500px;
             height: 90vh;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
+            background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
         .chat-header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            text-align: center;
+            position: relative;
         }
 
-        .chat-title {
-            font-size: 24px;
+        .chat-header h1 {
+            font-size: 1.5rem;
             font-weight: 600;
         }
 
-        .chat-stats {
-            text-align: right;
-            font-size: 14px;
+        .online-users {
+            font-size: 0.9rem;
             opacity: 0.9;
+            margin-top: 5px;
         }
 
-        .join-form {
-            padding: 40px;
-            text-align: center;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .join-form h2 {
-            margin-bottom: 30px;
-            color: #333;
-            font-size: 28px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .name-input, .room-input {
-            width: 100%;
-            max-width: 350px;
-            padding: 15px 20px;
-            margin: 0 auto 15px;
-            border: 2px solid #e1e8ed;
-            border-radius: 50px;
-            font-size: 16px;
-            text-align: center;
-            outline: none;
-            transition: all 0.3s ease;
-            display: block;
-        }
-
-        .name-input:focus, .room-input:focus {
-            border-color: #4facfe;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
-        }
-
-        .join-btn {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .join-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.4);
-        }
-
-        .chat-main {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-        }
-
-        .chat-main.active {
-            display: flex;
-        }
-
-        .users-sidebar {
-            background: #f8f9fa;
-            width: 200px;
-            padding: 15px;
-            border-right: 2px solid #e9ecef;
-            overflow-y: auto;
-        }
-
-        .users-header {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #495057;
-            font-size: 14px;
-        }
-
-        .user-item {
-            padding: 8px 10px;
-            margin-bottom: 5px;
-            background: white;
-            border-radius: 15px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .user-status {
-            width: 8px;
-            height: 8px;
-            background: #28a745;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .chat-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .messages-container {
+        .chat-messages {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
             background: #f8f9fa;
-            max-height: calc(90vh - 200px);
         }
 
         .message {
             margin-bottom: 15px;
-            animation: slideIn 0.3s ease;
-            display: flex;
-            flex-direction: column;
+            animation: slideIn 0.3s ease-out;
         }
 
         @keyframes slideIn {
@@ -188,615 +75,430 @@
         }
 
         .message.own {
-            align-items: flex-end;
-        }
-
-        .message-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .message.own .message-header {
-            flex-direction: row-reverse;
-        }
-
-        .message-author {
-            font-weight: 600;
-            margin-right: 8px;
-        }
-
-        .message.own .message-author {
-            margin-right: 0;
-            margin-left: 8px;
-        }
-
-        .message-time {
-            font-size: 11px;
+            text-align: right;
         }
 
         .message-bubble {
-            max-width: 70%;
-            padding: 12px 18px;
+            display: inline-block;
+            max-width: 80%;
+            padding: 12px 16px;
             border-radius: 20px;
             word-wrap: break-word;
-            position: relative;
+        }
+
+        .message.other .message-bubble {
+            background: #e9ecef;
+            color: #333;
+            border-bottom-left-radius: 5px;
         }
 
         .message.own .message-bubble {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border-bottom-right-radius: 5px;
         }
 
-        .message:not(.own) .message-bubble {
-            background: white;
-            color: #333;
-            border-bottom-left-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        .message-info {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 5px;
         }
 
-        .input-container {
+        .message.own .message-info {
+            text-align: right;
+        }
+
+        .system-message {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+
+        .chat-input {
+            display: flex;
             padding: 20px;
             background: white;
-            border-top: 1px solid #e1e8ed;
-            display: flex;
-            gap: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .username-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .username-input:focus {
+            border-color: #667eea;
         }
 
         .message-input {
             flex: 1;
-            padding: 12px 20px;
-            border: 2px solid #e1e8ed;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
             border-radius: 25px;
+            font-size: 1rem;
             outline: none;
-            font-size: 14px;
-            transition: all 0.3s ease;
+            margin-right: 10px;
+            transition: border-color 0.3s;
         }
 
         .message-input:focus {
-            border-color: #4facfe;
+            border-color: #667eea;
         }
 
         .send-btn {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
-            padding: 12px 25px;
             border-radius: 25px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: transform 0.2s;
         }
 
         .send-btn:hover {
             transform: scale(1.05);
         }
 
-        .system-message {
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .join-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 40px;
             text-align: center;
+        }
+
+        .join-screen h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .join-screen p {
             color: #666;
-            font-size: 12px;
-            margin: 10px 0;
-            font-style: italic;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 8px 15px;
-            border-radius: 15px;
-            display: inline-block;
-            margin: 10px auto;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .join-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+
+        .join-btn:hover {
+            transform: scale(1.05);
         }
 
         .typing-indicator {
-            padding: 10px 20px;
-            font-size: 12px;
-            color: #666;
             font-style: italic;
-            display: none;
-        }
-
-        .message-count {
-            font-size: 12px;
             color: #666;
-            text-align: center;
-            margin: 10px 0;
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            background: #f0f0f0;
+            margin: 5px 0;
+            border-radius: 15px;
+            animation: pulse 1.5s infinite;
         }
 
-        @media (max-width: 768px) {
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .emoji-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 10px;
+            padding: 10px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .emoji-btn:hover {
+            background: #f0f0f0;
+        }
+
+        @media (max-width: 480px) {
             .chat-container {
                 width: 100%;
                 height: 100vh;
                 border-radius: 0;
             }
             
-            .users-sidebar {
-                display: none;
-            }
-            
             .message-bubble {
-                max-width: 85%;
+                max-width: 90%;
             }
-            
-            .chat-main {
-                flex-direction: column;
-            }
-        }
-
-        .connection-status {
-            padding: 5px 10px;
-            background: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-            font-size: 12px;
-            border-radius: 10px;
         }
     </style>
 </head>
 <body>
     <div class="chat-container">
-        <div class="chat-header">
-            <div>
-                <div class="chat-title">Conference Chat Room</div>
-                <div class="connection-status" id="connectionStatus">🟢 Connected</div>
-            </div>
-            <div class="chat-stats">
-                <div id="onlineCount">0 users online</div>
-                <div id="messageCount">0 messages</div>
-            </div>
+        <div class="join-screen" id="joinScreen">
+            <h2>🌟 Join Group Chat</h2>
+            <p>Enter your name and start chatting with friends!</p>
+            <input type="text" class="username-input" id="usernameInput" placeholder="Enter your name..." maxlength="20">
+            <br><br>
+            <button class="join-btn" onclick="joinChat()">Start Chat 🚀</button>
         </div>
-        
-        <div class="join-form" id="joinForm">
-            <h2>Join Conference Chat</h2>
-            <div class="form-group">
-                <input type="text" class="name-input" id="nameInput" placeholder="Enter your name" maxlength="20">
-            </div>
-            <div class="form-group">
-                <input type="text" class="room-input" id="roomInput" placeholder="Room ID (optional)" maxlength="20" value="general">
-            </div>
-            <button class="join-btn" id="joinBtn">Join Chat Room</button>
+
+        <div class="chat-header" id="chatHeader" style="display: none;">
+            <h1>🌟 Group Chat</h1>
+            <div class="online-users" id="onlineUsers">You and your friends</div>
         </div>
+
+        <div class="chat-messages" id="chatMessages" style="display: none;"></div>
         
-        <div class="chat-main" id="chatMain">
-            <div class="users-sidebar" id="usersSidebar">
-                <div class="users-header">Online Users</div>
-                <div id="usersList"></div>
-            </div>
-            <div class="chat-content">
-                <div class="messages-container" id="messagesContainer">
-                    <div class="message-count">Messages are stored up to 1000. Start chatting!</div>
-                </div>
-                <div class="typing-indicator" id="typingIndicator"></div>
-                <div class="input-container">
-                    <input type="text" class="message-input" id="messageInput" placeholder="Type your message... (Max 500 chars)" maxlength="500">
-                    <button class="send-btn" id="sendBtn">Send</button>
-                </div>
-            </div>
+        <div class="typing-indicator" id="typingIndicator" style="display: none;"></div>
+
+        <div class="chat-input" id="chatInput" style="display: none;">
+            <button class="emoji-btn" onclick="addEmoji('😊')">😊</button>
+            <button class="emoji-btn" onclick="addEmoji('❤️')">❤️</button>
+            <button class="emoji-btn" onclick="addEmoji('👍')">👍</button>
+            <input type="text" class="message-input" id="messageInput" placeholder="Type your message..." maxlength="500">
+            <button class="send-btn" onclick="sendMessage()">Send</button>
         </div>
     </div>
-<script>
-        class MultiUserChat {
-            constructor() {
-                this.currentUser = null;
-                this.currentRoom = 'general';
-                this.messages = [];
-                this.users = new Map();
-                this.typingUsers = new Set();
-                this.maxMessages = 1000;
-                this.messageId = 1;
-                
-                this.initElements();
-                this.bindEvents();
-                this.simulateServerConnection();
-                this.loadPersistentData();
+
+    <script>
+        // Global variables
+        let currentUser = '';
+        let messages = [];
+        let users = [];
+        let isTyping = false;
+        let typingTimeout;
+
+        // Auto messages from website
+        const autoMessages = [
+            "🎉 Welcome to the group chat!",
+            "💫 Chat with all your friends here",
+            "🌟 Waiting for new messages...",
+            "🚀 Enjoy chatting!",
+            "💖 Spread love and positivity"
+        ];
+
+        // Initialize
+        window.onload = function() {
+            loadMessages();
+            loadUsers();
+            startAutoMessages();
+            setInterval(checkForUpdates, 1000);
+        };
+
+        function joinChat() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (username === '') {
+                alert('Please enter your name!');
+                return;
             }
             
-            initElements() {
-                this.joinForm = document.getElementById('joinForm');
-                this.chatMain = document.getElementById('chatMain');
-                this.nameInput = document.getElementById('nameInput');
-                this.roomInput = document.getElementById('roomInput');
-                this.joinBtn = document.getElementById('joinBtn');
-                this.messageInput = document.getElementById('messageInput');
-                this.sendBtn = document.getElementById('sendBtn');
-                this.messagesContainer = document.getElementById('messagesContainer');
-                this.onlineCount = document.getElementById('onlineCount');
-                this.messageCount = document.getElementById('messageCount');
-                this.usersList = document.getElementById('usersList');
-                this.connectionStatus = document.getElementById('connectionStatus');
-                this.typingIndicator = document.getElementById('typingIndicator');
-            }
+            currentUser = username;
+            addUser(username);
             
-            bindEvents() {
-                // Add debug logging
-                console.log('Binding events...');
-                
-                this.joinBtn.addEventListener('click', (e) => {
-                    console.log('Join button clicked');
-                    e.preventDefault();
-                    this.joinChat();
-                });
-                
-                this.nameInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        this.roomInput.focus();
-                    }
-                });
-                
-                this.roomInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        this.joinChat();
-                    }
-                });
-                
-                this.sendBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.sendMessage();
-                });
-                
-                this.messageInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        this.sendMessage();
-                    }
-                });
-                
-                this.messageInput.addEventListener('input', () => this.handleTyping());
-                
-                console.log('Events bound successfully');
-            }
+            document.getElementById('joinScreen').style.display = 'none';
+            document.getElementById('chatHeader').style.display = 'block';
+            document.getElementById('chatMessages').style.display = 'block';
+            document.getElementById('chatInput').style.display = 'flex';
             
-            loadPersistentData() {
-                // Simulate loading existing messages and users
-                const sampleMessages = [
-                    {
-                        id: this.messageId++,
-                        text: "Welcome to the conference chat! Feel free to introduce yourself.",
-                        author: "System Admin",
-                        authorId: "admin",
-                        timestamp: new Date(Date.now() - 300000),
-                        room: this.currentRoom,
-                        own: false
-                    },
-                    {
-                        id: this.messageId++,
-                        text: "Hi everyone! Excited to be here for the conference.",
-                        author: "Sarah Johnson",
-                        authorId: "sarah_j",
-                        timestamp: new Date(Date.now() - 240000),
-                        room: this.currentRoom,
-                        own: false
-                    },
-                    {
-                        id: this.messageId++,
-                        text: "Great turnout today! Looking forward to the sessions.",
-                        author: "Mike Chen",
-                        authorId: "mike_c",
-                        timestamp: new Date(Date.now() - 180000),
-                        room: this.currentRoom,
-                        own: false
-                    }
-                ];
-                
-                this.messages = sampleMessages;
-                
-                // Add sample users
-                this.users.set("sarah_j", { name: "Sarah Johnson", joinedAt: new Date(Date.now() - 300000), active: true });
-                this.users.set("mike_c", { name: "Mike Chen", joinedAt: new Date(Date.now() - 250000), active: true });
-                this.users.set("admin", { name: "System Admin", joinedAt: new Date(Date.now() - 400000), active: true });
-                
-                this.updateStats();
-            }
+            addSystemMessage(username + ' joined the chat! 🎉');
             
-            simulateServerConnection() {
-                // Simulate connection to server
-                setTimeout(() => {
-                    this.connectionStatus.innerHTML = '🟢 Connected to server';
-                }, 1000);
-                
-                // Simulate periodic new users joining
-                setInterval(() => {
-                    if (Math.random() < 0.2) {
-                        this.simulateUserJoin();
-                    }
-                }, 15000);
-                
-                // Simulate random messages from other users
-                setInterval(() => {
-                    if (Math.random() < 0.3 && this.currentUser) {
-                        this.simulateRandomMessage();
-                    }
-                }, 8000);
-            }
-            
-            joinChat() {
-                console.log('joinChat called');
-                const name = this.nameInput.value.trim();
-                const room = this.roomInput.value.trim() || 'general';
-                
-                console.log('Name:', name, 'Room:', room);
-                
-                if (!name) {
-                    alert('Please enter your name');
-                    this.nameInput.focus();
-                    return;
+            // Enable enter key for sending messages
+            document.getElementById('messageInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
                 }
-                
-                if (name.length < 2) {
-                    alert('Name must be at least 2 characters');
-                    this.nameInput.focus();
-                    return;
-                }
-                
-                this.currentUser = {
-                    name: name,
-                    id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                    joinedAt: new Date(),
-                    room: room
-                };
-                
-                console.log('User created:', this.currentUser);
-                
-                this.currentRoom = room;
-                this.users.set(this.currentUser.id, {
-                    name: this.currentUser.name,
-                    joinedAt: this.currentUser.joinedAt,
-                    active: true
-                });
-                
-                console.log('Hiding join form, showing chat');
-                this.joinForm.style.display = 'none';
-                this.chatMain.classList.add('active');
-                
-                // Wait a bit then focus
-                setTimeout(() => {
-                    if (this.messageInput) {
-                        this.messageInput.focus();
-                    }
-                }, 100);
-                
-                // Load existing messages for this user
-                this.renderAllMessages();
-                this.addSystemMessage(`${this.currentUser.name} joined the chat room: ${room}`);
-                this.updateStats();
-                this.updateUsersList();
-                
-                console.log('Join process completed');
-            }
-            
-            sendMessage() {
-                const text = this.messageInput.value.trim();
-                if (!text) return;
-                
-                const message = {
-                    id: this.messageId++,
-                    text: text,
-                    author: this.currentUser.name,
-                    authorId: this.currentUser.id,
-                    timestamp: new Date(),
-                    room: this.currentRoom,
-                    own: true
-                };
-                
-                this.addMessageToStore(message);
-                this.addMessageToDOM(message);
-                this.messageInput.value = '';
-                this.updateStats();
-                
-                // Simulate message broadcast to other users
-                this.simulateMessageResponse(text);
-            }
-            
-            addMessageToStore(message) {
-                this.messages.push(message);
-                
-                // Keep only last 1000 messages
-                if (this.messages.length > this.maxMessages) {
-                    const removed = this.messages.splice(0, this.messages.length - this.maxMessages);
-                    console.log(`Removed ${removed.length} old messages. Keeping last ${this.maxMessages} messages.`);
-                }
-            }
-            
-            renderAllMessages() {
-                this.messagesContainer.innerHTML = '<div class="message-count">Loading previous messages...</div>';
-                
-                setTimeout(() => {
-                    this.messagesContainer.innerHTML = '';
-                    
-                    // Show message count info
-                    const countInfo = document.createElement('div');
-                    countInfo.className = 'message-count';
-                    countInfo.textContent = `Showing ${this.messages.length} messages (max 1000 stored)`;
-                    this.messagesContainer.appendChild(countInfo);
-                    
-                    this.messages.forEach(message => {
-                        this.addMessageToDOM(message);
-                    });
-                    
-                    this.scrollToBottom();
-                }, 500);
-            }
-            
-            addMessageToDOM(message) {
-                const messageEl = document.createElement('div');
-                messageEl.className = `message ${message.own ? 'own' : ''}`;
-                messageEl.dataset.messageId = message.id;
-                
-                messageEl.innerHTML = `
-                    <div class="message-header">
-                        <span class="message-author">${this.escapeHtml(message.author)}</span>
-                        <span class="message-time">${this.formatTime(message.timestamp)}</span>
-                    </div>
-                    <div class="message-bubble">${this.escapeHtml(message.text)}</div>
+                handleTyping();
+            });
+        }
+
+        function sendMessage() {
+            const messageText = document.getElementById('messageInput').value.trim();
+            if (messageText === '' || currentUser === '') return;
+
+            const message = {
+                id: Date.now(),
+                user: currentUser,
+                text: messageText,
+                timestamp: new Date().toLocaleTimeString('hi-IN'),
+                type: 'user'
+            };
+
+            addMessage(message);
+            document.getElementById('messageInput').value = '';
+            stopTyping();
+        }
+
+        function addMessage(message) {
+            messages.push(message);
+            saveMessages();
+            displayMessage(message);
+            scrollToBottom();
+        }
+
+        function displayMessage(message) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = message.user === currentUser ? 'message own' : 'message other';
+
+            if (message.type === 'system') {
+                messageDiv.innerHTML = `<div class="system-message">${message.text}</div>`;
+            } else if (message.type === 'auto') {
+                messageDiv.innerHTML = `
+                    <div class="message-info">🤖 Website</div>
+                    <div class="message-bubble">${message.text}</div>
                 `;
-                
-                this.messagesContainer.appendChild(messageEl);
-                this.scrollToBottom();
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-info">${message.user} • ${message.timestamp}</div>
+                    <div class="message-bubble">${message.text}</div>
+                `;
             }
-            
-            addSystemMessage(text) {
-                const messageEl = document.createElement('div');
-                messageEl.className = 'system-message';
-                messageEl.textContent = text;
-                this.messagesContainer.appendChild(messageEl);
-                this.scrollToBottom();
-            }
-            
-            simulateUserJoin() {
-                const names = ['Alex Rivera', 'Emma Watson', 'David Kim', 'Lisa Zhang', 'James Wilson', 'Ana Garcia'];
-                const randomName = names[Math.floor(Math.random() * names.length)];
-                
-                const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-                this.users.set(userId, {
-                    name: randomName,
-                    joinedAt: new Date(),
-                    active: true
-                });
-                
-                this.addSystemMessage(`${randomName} joined the chat`);
-                this.updateStats();
-                this.updateUsersList();
-            }
-            
-            simulateRandomMessage() {
-                const activeUsers = Array.from(this.users.entries())
-                    .filter(([id, user]) => user.active && id !== this.currentUser?.id)
-                    .filter(([id, user]) => user.name !== 'System Admin');
-                
-                if (activeUsers.length === 0) return;
-                
-                const [userId, user] = activeUsers[Math.floor(Math.random() * activeUsers.length)];
-                
-                const casualMessages = [
-                    "Thanks for the great insights everyone!",
-                    "Really enjoying this discussion 👍",
-                    "Has anyone tried the networking app?",
-                    "Looking forward to the next session",
-                    "Great points being made here",
-                    "This conference is fantastic!",
-                    "Anyone else taking notes? 📝",
-                    "The speakers have been amazing",
-                    "Love the interactive format",
-                    "What did everyone think of the last talk?",
-                    "Coffee break was much needed ☕",
-                    "Who else is staying for the evening event?",
-                    "The venue is incredible!",
-                    "Met some amazing people today",
-                    "This chat is so helpful for staying connected"
-                ];
-                
-                const message = {
-                    id: this.messageId++,
-                    text: casualMessages[Math.floor(Math.random() * casualMessages.length)],
-                    author: user.name,
-                    authorId: userId,
-                    timestamp: new Date(),
-                    room: this.currentRoom,
-                    own: false
-                };
-                
-                this.addMessageToStore(message);
-                this.addMessageToDOM(message);
-                this.updateStats();
-            }
-            
-            simulateMessageResponse(userMessage) {
-                // Simulate someone responding to user's message
-                setTimeout(() => {
-                    const activeUsers = Array.from(this.users.entries())
-                        .filter(([id, user]) => user.active && id !== this.currentUser?.id)
-                        .filter(([id, user]) => user.name !== 'System Admin');
-                    
-                    if (activeUsers.length === 0) return;
-                    
-                    const [userId, user] = activeUsers[Math.floor(Math.random() * activeUsers.length)];
-                    
-                    const responses = [
-                        "That's a great point!",
-                        "I completely agree with that",
-                        "Thanks for sharing that insight",
-                        "Really interesting perspective",
-                        "I hadn't thought of it that way",
-                        "Absolutely! 💯",
-                        "Could you elaborate on that?",
-                        "That's exactly what I was thinking",
-                        "Great question!",
-                        "Very insightful, thanks!"
-                    ];
-                    
-                    const response = {
-                        id: this.messageId++,
-                        text: responses[Math.floor(Math.random() * responses.length)],
-                        author: user.name,
-                        authorId: userId,
-                        timestamp: new Date(),
-                        room: this.currentRoom,
-                        own: false
-                    };
-                    
-                    this.addMessageToStore(response);
-                    this.addMessageToDOM(response);
-                    this.updateStats();
-                }, 1000 + Math.random() * 3000);
-            }
-            
-            updateUsersList() {
-                this.usersList.innerHTML = '';
-                
-                const sortedUsers = Array.from(this.users.entries())
-                    .sort((a, b) => b[1].joinedAt - a[1].joinedAt);
-                
-                sortedUsers.forEach(([id, user]) => {
-                    const userEl = document.createElement('div');
-                    userEl.className = 'user-item';
-                    userEl.innerHTML = `
-                        <div class="user-status"></div>
-                        <span>${this.escapeHtml(user.name)}</span>
-                    `;
-                    this.usersList.appendChild(userEl);
-                });
-            }
-            
-            updateStats() {
-                this.onlineCount.textContent = `${this.users.size} users online`;
-                this.messageCount.textContent = `${this.messages.length}/1000 messages`;
-            }
-            
-            handleTyping() {
-                // In a real implementation, this would notify other users
-                clearTimeout(this.typingTimeout);
-                this.typingTimeout = setTimeout(() => {
-                    // Stop showing typing indicator
-                }, 1000);
-            }
-            
-            scrollToBottom() {
-                setTimeout(() => {
-                    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
-                }, 100);
-            }
-            
-            formatTime(date) {
-                return date.toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    hour12: true 
-                });
-            }
-            
-            escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
+
+            messagesDiv.appendChild(messageDiv);
+        }
+
+        function addSystemMessage(text) {
+            const message = {
+                id: Date.now(),
+                text: text,
+                timestamp: new Date().toLocaleTimeString('hi-IN'),
+                type: 'system'
+            };
+            addMessage(message);
+        }
+
+        function addAutoMessage() {
+            const randomMessage = autoMessages[Math.floor(Math.random() * autoMessages.length)];
+            const message = {
+                id: Date.now(),
+                user: 'Website',
+                text: randomMessage,
+                timestamp: new Date().toLocaleTimeString('hi-IN'),
+                type: 'auto'
+            };
+            addMessage(message);
+        }
+
+        function startAutoMessages() {
+            // Send auto message every 30 seconds
+            setInterval(() => {
+                if (Math.random() < 0.3) { // 30% chance
+                    addAutoMessage();
+                }
+            }, 30000);
+        }
+
+        function addUser(username) {
+            if (!users.includes(username)) {
+                users.push(username);
+                saveUsers();
+                updateOnlineUsers();
             }
         }
-        
-        // Initialize the multi-user chat
-        document.addEventListener('DOMContentLoaded', () => {
-            new MultiUserChat();
-        });
+
+        function updateOnlineUsers() {
+            const onlineDiv = document.getElementById('onlineUsers');
+            onlineDiv.textContent = `${users.length} users online: ${users.join(', ')}`;
+        }
+
+        function handleTyping() {
+            if (!isTyping) {
+                isTyping = true;
+                showTyping(currentUser + ' is typing...');
+            }
+            
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(stopTyping, 2000);
+        }
+
+        function showTyping(text) {
+            const typingDiv = document.getElementById('typingIndicator');
+            typingDiv.textContent = text;
+            typingDiv.style.display = 'block';
+        }
+
+        function stopTyping() {
+            isTyping = false;
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function addEmoji(emoji) {
+            const input = document.getElementById('messageInput');
+            input.value += emoji;
+            input.focus();
+        }
+
+        function scrollToBottom() {
+            const messagesDiv = document.getElementById('chatMessages');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function checkForUpdates() {
+            const savedMessages = JSON.parse(localStorage.getItem('groupChatMessages') || '[]');
+            const savedUsers = JSON.parse(localStorage.getItem('groupChatUsers') || '[]');
+            
+            // Check for new messages
+            if (savedMessages.length > messages.length) {
+                const newMessages = savedMessages.slice(messages.length);
+                newMessages.forEach(message => {
+                    messages.push(message);
+                    displayMessage(message);
+                });
+                scrollToBottom();
+            }
+            
+            // Check for new users
+            if (savedUsers.length !== users.length) {
+                users = [...savedUsers];
+                updateOnlineUsers();
+            }
+        }
+
+        function saveMessages() {
+            localStorage.setItem('groupChatMessages', JSON.stringify(messages));
+        }
+
+        function loadMessages() {
+            const saved = localStorage.getItem('groupChatMessages');
+            if (saved) {
+                messages = JSON.parse(saved);
+                messages.forEach(displayMessage);
+                scrollToBottom();
+            }
+        }
+
+        function saveUsers() {
+            localStorage.setItem('groupChatUsers', JSON.stringify(users));
+        }
+
+        function loadUsers() {
+            const saved = localStorage.getItem('groupChatUsers');
+            if (saved) {
+                users = JSON.parse(saved);
+                updateOnlineUsers();
+            }
+        }
     </script>
 </body>
 </html>
-    
