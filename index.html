@@ -113,9 +113,12 @@
 
         .chat-main {
             flex: 1;
-            display: flex;
-            flex-direction: column;
             display: none;
+            flex-direction: column;
+        }
+
+        .chat-main.active {
+            display: flex;
         }
 
         .users-sidebar {
@@ -353,7 +356,7 @@
             <button class="join-btn" id="joinBtn">Join Chat Room</button>
         </div>
         
-        <div class="chat-main" id="chatMain" style="display: flex;">
+        <div class="chat-main" id="chatMain">
             <div class="users-sidebar" id="usersSidebar">
                 <div class="users-header">Online Users</div>
                 <div id="usersList"></div>
@@ -405,15 +408,34 @@
             }
             
             bindEvents() {
-                this.joinBtn.addEventListener('click', () => this.joinChat());
-                this.nameInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.roomInput.focus();
-                });
-                this.roomInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.joinChat();
+                // Add debug logging
+                console.log('Binding events...');
+                
+                this.joinBtn.addEventListener('click', (e) => {
+                    console.log('Join button clicked');
+                    e.preventDefault();
+                    this.joinChat();
                 });
                 
-                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.nameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.roomInput.focus();
+                    }
+                });
+                
+                this.roomInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.joinChat();
+                    }
+                });
+                
+                this.sendBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.sendMessage();
+                });
+                
                 this.messageInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -422,6 +444,8 @@
                 });
                 
                 this.messageInput.addEventListener('input', () => this.handleTyping());
+                
+                console.log('Events bound successfully');
             }
             
             loadPersistentData() {
@@ -488,10 +512,20 @@
             }
             
             joinChat() {
+                console.log('joinChat called');
                 const name = this.nameInput.value.trim();
                 const room = this.roomInput.value.trim() || 'general';
                 
+                console.log('Name:', name, 'Room:', room);
+                
                 if (!name) {
+                    alert('Please enter your name');
+                    this.nameInput.focus();
+                    return;
+                }
+                
+                if (name.length < 2) {
+                    alert('Name must be at least 2 characters');
                     this.nameInput.focus();
                     return;
                 }
@@ -503,6 +537,8 @@
                     room: room
                 };
                 
+                console.log('User created:', this.currentUser);
+                
                 this.currentRoom = room;
                 this.users.set(this.currentUser.id, {
                     name: this.currentUser.name,
@@ -510,15 +546,24 @@
                     active: true
                 });
                 
+                console.log('Hiding join form, showing chat');
                 this.joinForm.style.display = 'none';
-                this.chatMain.style.display = 'flex';
-                this.messageInput.focus();
+                this.chatMain.classList.add('active');
+                
+                // Wait a bit then focus
+                setTimeout(() => {
+                    if (this.messageInput) {
+                        this.messageInput.focus();
+                    }
+                }, 100);
                 
                 // Load existing messages for this user
                 this.renderAllMessages();
                 this.addSystemMessage(`${this.currentUser.name} joined the chat room: ${room}`);
                 this.updateStats();
                 this.updateUsersList();
+                
+                console.log('Join process completed');
             }
             
             sendMessage() {
@@ -563,36 +608,4 @@
                     // Show message count info
                     const countInfo = document.createElement('div');
                     countInfo.className = 'message-count';
-                    countInfo.textContent = `Showing ${this.messages.length} messages (max 1000 stored)`;
-                    this.messagesContainer.appendChild(countInfo);
-                    
-                    this.messages.forEach(message => {
-                        this.addMessageToDOM(message);
-                    });
-                    
-                    this.scrollToBottom();
-                }, 500);
-            }
-            
-            addMessageToDOM(message) {
-                const messageEl = document.createElement('div');
-                messageEl.className = `message ${message.own ? 'own' : ''}`;
-                messageEl.dataset.messageId = message.id;
-                
-                messageEl.innerHTML = `
-                    <div class="message-header">
-                        <span class="message-author">${this.escapeHtml(message.author)}</span>
-                        <span class="message-time">${this.formatTime(message.timestamp)}</span>
-                    </div>
-                    <div class="message-bubble">${this.escapeHtml(message.text)}</div>
-                `;
-                
-                this.messagesContainer.appendChild(messageEl);
-                this.scrollToBottom();
-            }
-            
-            addSystemMessage(text) {
-                const messageEl = document.createElement('div');
-                messageEl.className = 'system-message';
-                messageEl.textContent = text;
-             
+                    countInf
