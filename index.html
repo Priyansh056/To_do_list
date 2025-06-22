@@ -1,24 +1,516 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>BusTrack Demo</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conference Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-container {
+            width: 95%;
+            max-width: 800px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .chat-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .online-count {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .join-form {
+            padding: 30px;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .join-form h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .name-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 15px 20px;
+            margin: 0 auto 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 50px;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .name-input:focus {
+            border-color: #ff6b6b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .join-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .join-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            display: none;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.own {
+            text-align: right;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            word-wrap: break-word;
+        }
+
+        .message.own .message-bubble {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message:not(.own) .message-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-author {
+            font-size: 12px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            opacity: 0.7;
+        }
+
+        .message.own .message-author {
+            color: #ff6b6b;
+        }
+
+        .message:not(.own) .message-author {
+            color: #666;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 5px;
+        }
+
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e1e8ed;
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: #ff6b6b;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .typing-indicator {
+            padding: 10px 20px;
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+            display: none;
+        }
+
+        .system-message {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .chat-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .message-bubble {
+                max-width: 85%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h2>🚌 Bus Schedule Finder (Demo)</h2>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="chat-title">Conference Chat</div>
+            <div class="online-count" id="onlineCount">Connecting...</div>
+        </div>
+        
+        <div class="join-form" id="joinForm">
+            <h2>Join the conversation!</h2>
+            <input type="text" class="name-input" id="nameInput" placeholder="Enter your name" maxlength="20">
+            <button class="join-btn" id="joinBtn">Start Chatting</button>
+        </div>
+        
+        <div class="chat-main" id="chatMain">
+            <div class="messages-container" id="messagesContainer"></div>
+            <div class="typing-indicator" id="typingIndicator"></div>
+            <div class="input-container">
+                <input type="text" class="message-input" id="messageInput" placeholder="Type your message..." maxlength="500">
+                <button class="send-btn" id="sendBtn">Send</button>
+            </div>
+        </div>
+    </div>
 
-  <label>From:</label><br>
-  <input type="text" id="from" placeholder="e.g., Bhopal"><br>
-
-  <label>To:</label><br>
-  <input type="text" id="to" placeholder="e.g., Indore"><br>
-
-  <button onclick="findBus()">🔍 Search</button>
-
-
-  <div id="output"></div>
-
-  <script src="app.js"></script>
+    <script>
+        class ConferenceChat {
+            constructor() {
+                this.currentUser = null;
+                this.messages = [];
+                this.users = new Set();
+                this.typingUsers = new Set();
+                this.typingTimeout = null;
+                
+                this.initElements();
+                this.bindEvents();
+                this.updateOnlineCount();
+            }
+            
+            initElements() {
+                this.joinForm = document.getElementById('joinForm');
+                this.chatMain = document.getElementById('chatMain');
+                this.nameInput = document.getElementById('nameInput');
+                this.joinBtn = document.getElementById('joinBtn');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.messagesContainer = document.getElementById('messagesContainer');
+                this.onlineCount = document.getElementById('onlineCount');
+                this.typingIndicator = document.getElementById('typingIndicator');
+            }
+            
+            bindEvents() {
+                this.joinBtn.addEventListener('click', () => this.joinChat());
+                this.nameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.joinChat();
+                });
+                
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+                
+                this.messageInput.addEventListener('input', () => this.handleTyping());
+            }
+            
+            joinChat() {
+                const name = this.nameInput.value.trim();
+                if (!name) {
+                    this.nameInput.focus();
+                    return;
+                }
+                
+                this.currentUser = {
+                    name: name,
+                    id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    joinedAt: new Date()
+                };
+                
+                this.users.add(this.currentUser.name);
+                this.joinForm.style.display = 'none';
+                this.chatMain.style.display = 'flex';
+                this.messageInput.focus();
+                
+                this.addSystemMessage(`${this.currentUser.name} joined the chat`);
+                this.updateOnlineCount();
+                
+                // Simulate other users joining/leaving
+                this.simulateActivity();
+            }
+            
+            sendMessage() {
+                const text = this.messageInput.value.trim();
+                if (!text) return;
+                
+                const message = {
+                    id: 'msg_' + Date.now(),
+                    text: text,
+                    author: this.currentUser.name,
+                    authorId: this.currentUser.id,
+                    timestamp: new Date(),
+                    own: true
+                };
+                
+                this.messages.push(message);
+                this.addMessage(message);
+                this.messageInput.value = '';
+                
+                // Simulate responses from other users
+                this.simulateResponse(text);
+            }
+            
+            addMessage(message) {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${message.own ? 'own' : ''}`;
+                
+                messageEl.innerHTML = `
+                    <div class="message-author">${message.author}</div>
+                    <div class="message-bubble">${this.escapeHtml(message.text)}</div>
+                    <div class="message-time">${this.formatTime(message.timestamp)}</div>
+                `;
+                
+                this.messagesContainer.appendChild(messageEl);
+                this.scrollToBottom();
+            }
+            
+            addSystemMessage(text) {
+                const messageEl = document.createElement('div');
+                messageEl.className = 'system-message';
+                messageEl.textContent = text;
+                this.messagesContainer.appendChild(messageEl);
+                this.scrollToBottom();
+            }
+            
+            simulateResponse(userMessage) {
+                // Simulate someone typing
+                setTimeout(() => {
+                    this.showTyping('Alex');
+                    
+                    setTimeout(() => {
+                        this.hideTyping();
+                        const responses = [
+                            "That's interesting!",
+                            "I agree with that",
+                            "Thanks for sharing",
+                            "Good point!",
+                            "Absolutely!",
+                            "I was thinking the same thing",
+                            "Can you tell me more about that?",
+                            "That makes sense",
+                            "Great idea!",
+                            "I hadn't thought of it that way"
+                        ];
+                        
+                        const response = {
+                            id: 'msg_' + Date.now(),
+                            text: responses[Math.floor(Math.random() * responses.length)],
+                            author: 'Alex',
+                            timestamp: new Date(),
+                            own: false
+                        };
+                        
+                        this.messages.push(response);
+                        this.addMessage(response);
+                    }, 1000 + Math.random() * 2000);
+                }, 500 + Math.random() * 1500);
+            }
+            
+            simulateActivity() {
+                // Add some demo users
+                const demoUsers = ['Sarah', 'Mike', 'Emma', 'John'];
+                demoUsers.forEach(name => this.users.add(name));
+                this.updateOnlineCount();
+                
+                // Simulate periodic activity
+                setInterval(() => {
+                    if (Math.random() < 0.3) {
+                        const activeUsers = Array.from(this.users).filter(u => u !== this.currentUser.name);
+                        if (activeUsers.length > 0) {
+                            const randomUser = activeUsers[Math.floor(Math.random() * activeUsers.length)];
+                            const casualMessages = [
+                                "Hey everyone! 👋",
+                                "How's the conference going?",
+                                "Great session earlier",
+                                "Anyone else excited about the next talk?",
+                                "The networking has been amazing",
+                                "Love meeting everyone here!",
+                                "This chat is so helpful",
+                                "Thanks for the great discussions"
+                            ];
+                            
+                            const message = {
+                                id: 'msg_' + Date.now(),
+                                text: casualMessages[Math.floor(Math.random() * casualMessages.length)],
+                                author: randomUser,
+                                timestamp: new Date(),
+                                own: false
+                            };
+                            
+                            this.messages.push(message);
+                            this.addMessage(message);
+                        }
+                    }
+                }, 10000 + Math.random() * 20000);
+            }
+            
+            handleTyping() {
+                if (this.typingTimeout) {
+                    clearTimeout(this.typingTimeout);
+                }
+                
+                this.typingTimeout = setTimeout(() => {
+                    // Stop showing typing
+                }, 1000);
+            }
+            
+            showTyping(username) {
+                this.typingUsers.add(username);
+                this.updateTypingIndicator();
+            }
+            
+            hideTyping(username = null) {
+                if (username) {
+                    this.typingUsers.delete(username);
+                } else {
+                    this.typingUsers.clear();
+                }
+                this.updateTypingIndicator();
+            }
+            
+            updateTypingIndicator() {
+                if (this.typingUsers.size === 0) {
+                    this.typingIndicator.style.display = 'none';
+                } else {
+                    const users = Array.from(this.typingUsers);
+                    let text = users.length === 1 
+                        ? `${users[0]} is typing...`
+                        : `${users.slice(0, -1).join(', ')} and ${users[users.length - 1]} are typing...`;
+                    
+                    this.typingIndicator.textContent = text;
+                    this.typingIndicator.style.display = 'block';
+                }
+            }
+            
+            updateOnlineCount() {
+                this.onlineCount.textContent = `${this.users.size} people online`;
+            }
+            
+            scrollToBottom() {
+                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+            }
+            
+            formatTime(date) {
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+        
+        // Initialize the chat when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new ConferenceChat();
+        });
+    </script>
 </body>
 </html>
