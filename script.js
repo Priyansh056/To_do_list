@@ -1,4 +1,4 @@
-        // Global variables
+         // Global variables
         let currentUser = '';
         let messages = [];
         let users = [];
