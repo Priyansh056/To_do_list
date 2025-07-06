@@ -310,145 +310,6 @@
       animation: confirmationSlideIn 0.8s ease-out;
     }
 
-    .ticket-confirmation.premium {
-      background: linear-gradient(135deg, #ffd700, #ffb347, #ff8c00);
-    }
-
-    .ticket-confirmation.premium .confirmation-content {
-      animation: premiumBounceIn 1.2s ease-out 0.3s both;
-    }
-
-    .ticket-confirmation.premium .check-icon {
-      animation: premiumCheckPulse 1.5s ease-in-out infinite;
-      color: #ff8c00;
-      text-shadow: 0 0 20px rgba(255, 140, 0, 0.8);
-    }
-
-    .ticket-confirmation.premium .confirmation-title {
-      animation: premiumTitleGlow 2s ease-in-out infinite;
-      color: #ff8c00;
-      text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-    }
-
-    .ticket-confirmation.premium .ticket-info {
-      background: rgba(255, 215, 0, 0.2);
-      border: 2px solid rgba(255, 215, 0, 0.3);
-      box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
-    }
-
-    .ticket-confirmation.premium .continue-btn {
-      background: linear-gradient(45deg, #ffd700, #ffb347);
-      color: #ff8c00;
-      box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-      animation: premiumButtonGlow 2s ease-in-out infinite;
-    }
-
-    .ticket-confirmation.premium .continue-btn:hover {
-      box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
-    }
-
-    @keyframes premiumBounceIn {
-      0% { 
-        transform: scale(0.3) rotate(-10deg); 
-        opacity: 0; 
-      }
-      50% { 
-        transform: scale(1.1) rotate(5deg); 
-        opacity: 1; 
-      }
-      70% { 
-        transform: scale(0.9) rotate(-2deg); 
-      }
-      100% { 
-        transform: scale(1) rotate(0deg); 
-      }
-    }
-
-    @keyframes premiumCheckPulse {
-      0% { 
-        transform: scale(1) rotate(0deg); 
-        filter: brightness(1);
-      }
-      50% { 
-        transform: scale(1.2) rotate(5deg); 
-        filter: brightness(1.3);
-      }
-      100% { 
-        transform: scale(1) rotate(0deg); 
-        filter: brightness(1);
-      }
-    }
-
-    @keyframes premiumTitleGlow {
-      0% { 
-        text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-        transform: scale(1);
-      }
-      50% { 
-        text-shadow: 0 0 50px rgba(255, 140, 0, 1), 0 0 80px rgba(255, 215, 0, 0.6);
-        transform: scale(1.05);
-      }
-      100% { 
-        text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-        transform: scale(1);
-      }
-    }
-
-    @keyframes premiumButtonGlow {
-      0% { 
-        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-        transform: scale(1);
-      }
-      50% { 
-        box-shadow: 0 8px 25px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 140, 0, 0.4);
-        transform: scale(1.02);
-      }
-      100% { 
-        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-        transform: scale(1);
-      }
-    }
-
-    .ticket-confirmation.premium .confetti {
-      background: #ffd700;
-    }
-
-    .ticket-confirmation.premium .confetti:nth-child(2n) { background: #ffb347; }
-    .ticket-confirmation.premium .confetti:nth-child(3n) { background: #ff8c00; }
-    .ticket-confirmation.premium .confetti:nth-child(4n) { background: #ffa500; }
-    .ticket-confirmation.premium .confetti:nth-child(5n) { background: #gold; }
-
-    .premium-sparkles {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    .sparkle {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: #ffd700;
-      border-radius: 50%;
-      animation: sparkleFloat 3s ease-in-out infinite;
-    }
-
-    @keyframes sparkleFloat {
-      0% { 
-        transform: translateY(0) scale(0); 
-        opacity: 0; 
-      }
-      50% { 
-        transform: translateY(-20px) scale(1); 
-        opacity: 1; 
-      }
-      100% { 
-        transform: translateY(-40px) scale(0); 
-        opacity: 0; 
-      }
-    }
-
     @keyframes confirmationSlideIn {
       0% { 
         transform: translateY(100%); 
@@ -805,4 +666,112 @@
         <span id="totalAmount">-</span>
       </div>
     </div>
+    
+    <button class="continue-btn" onclick="closeConfirmation()">
+      Continue Booking
+    </button>
+  </div>
   
+  <!-- Confetti Animation -->
+  <div class="confetti" style="left: 10%; animation-delay: 0s;"></div>
+  <div class="confetti" style="left: 20%; animation-delay: 0.5s;"></div>
+  <div class="confetti" style="left: 30%; animation-delay: 1s;"></div>
+  <div class="confetti" style="left: 40%; animation-delay: 1.5s;"></div>
+  <div class="confetti" style="left: 50%; animation-delay: 2s;"></div>
+  <div class="confetti" style="left: 60%; animation-delay: 0.3s;"></div>
+  <div class="confetti" style="left: 70%; animation-delay: 0.8s;"></div>
+  <div class="confetti" style="left: 80%; animation-delay: 1.3s;"></div>
+  <div class="confetti" style="left: 90%; animation-delay: 1.8s;"></div>
+</div>
+
+<script>
+  function showTicketConfirmation(seatType, amount) {
+    const passengerName = document.getElementById('memberName').value;
+    
+    // Update ticket details
+    document.getElementById('passengerName').textContent = passengerName;
+    document.getElementById('seatType').textContent = seatType;
+    document.getElementById('totalAmount').textContent = amount;
+    
+    // Show full screen confirmation
+    document.getElementById('ticketConfirmation').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeConfirmation() {
+    document.getElementById('ticketConfirmation').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    goBack();
+  }
+
+  function openForm() {
+    document.querySelector('.main-box').style.display = 'none';
+    document.getElementById('formPage').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function goBack() {
+    document.querySelector('.main-box').style.display = 'flex';
+    document.getElementById('formPage').style.display = 'none';
+    document.getElementById('successMessage').style.display = 'none';
+    document.getElementById('bookingForm').reset();
+    clearErrors();
+    window.scrollTo(0, 0);
+  }
+
+  function validateForm() {
+    let isValid = true;
+    clearErrors();
+
+    // Validate name
+    const name = document.getElementById('memberName').value.trim();
+    if (name === '') {
+      showError('memberName', 'memberNameError', 'Please enter your full name');
+      isValid = false;
+    } else if (name.length < 2) {
+      showError('memberName', 'memberNameError', 'Name must be at least 2 characters long');
+      isValid = false;
+    }
+
+    // Validate contact
+    const contact = document.getElementById('contact').value.trim();
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (contact === '') {
+      showError('contact', 'contactError', 'Please enter your contact number');
+      isValid = false;
+    } else if (!phoneRegex.test(contact)) {
+      showError('contact', 'contactError', 'Please enter a valid 10-digit mobile number');
+      isValid = false;
+    }
+
+    // Validate gender
+    const gender = document.querySelector('input[name="gender"]:checked');
+    if (!gender) {
+      showError('gender', 'genderError', 'Please select your gender');
+      isValid = false;
+    }
+
+    // Validate age
+    const age = document.getElementById('age').value;
+    if (age === '') {
+      showError('age', 'ageError', 'Please select your age group');
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  function showError(inputId, errorId, message) {
+    const input = document.getElementById(inputId);
+    const error = document.getElementById(errorId);
+    
+    if (input) {
+      input.classList.add('input-error');
+    }
+    if (error) {
+      error.textContent = message;
+      error.style.display = 'block';
+    }
+  }
+
+  function cl
