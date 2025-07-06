@@ -773,5 +773,109 @@
       error.style.display = 'block';
     }
   }
+  function clearErrors() {
+    const errorElements = document.querySelectorAll('.form-error');
+    const inputElements = document.querySelectorAll('.input-error');
+    
+    errorElements.forEach(error => {
+      error.style.display = 'none';
+    });
+    
+    inputElements.forEach(input => {
+      input.classList.remove('input-error');
+    });
+  }
+
+  // Book Ticket button functionality
+  document.querySelector('.book-ticket-btn').addEventListener('click', function() {
+    if (validateForm()) {
+      // Simulate regular booking process
+      const submitButton = this;
+      const originalText = submitButton.textContent;
+      
+      submitButton.textContent = 'Processing...';
+      submitButton.disabled = true;
+      
+      setTimeout(() => {
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+        document.getElementById('successMessage').innerHTML = `
+          🎉 Regular Booking Successful! <br>
+          Your ticket has been confirmed for ₹800. Check your mobile for details.
+        `;
+        document.getElementById('successMessage').innerHTML = `
+          🎉 Premium Booking Successful! <br>
+          Your premium ticket has been confirmed for ₹1,200. Check your mobile for details.
+        `;
+        document.getElementById('successMessage').style.display = 'block';
+        document.getElementById('bookingForm').style.display = 'none';
+        
+        // Auto scroll to success message
+        document.getElementById('successMessage').scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }, 2000);
+    }
+  });
+
+  // Form submission
+  document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (validateForm()) {
+      // Simulate booking process
+      const submitButton = document.querySelector('.buy-btn');
+      const originalText = submitButton.textContent;
+      
+      submitButton.textContent = 'Processing...';
+      submitButton.disabled = true;
+      
+      setTimeout(() => {
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+        document.getElementById('successMessage').style.display = 'block';
+        document.getElementById('bookingForm').style.display = 'none';
+        
+        // Auto scroll to success message
+        document.getElementById('successMessage').scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }, 2000);
+    }
+  });
+
+  // Real-time validation
+  document.getElementById('memberName').addEventListener('input', function() {
+    if (this.value.trim() !== '') {
+      this.classList.remove('input-error');
+      document.getElementById('memberNameError').style.display = 'none';
+    }
+  });
+
+  document.getElementById('contact').addEventListener('input', function() {
+    if (this.value.trim() !== '') {
+      this.classList.remove('input-error');
+      document.getElementById('contactError').style.display = 'none';
+    }
+  });
+
+  document.querySelectorAll('input[name="gender"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      document.getElementById('genderError').style.display = 'none';
+    });
+  });
+
+  document.getElementById('age').addEventListener('change', function() {
+    if (this.value !== '') {
+      this.classList.remove('input-error');
+      document.getElementById('ageError').style.display = 'none';
+    }
+  });
+</script>
+
+</body>
+</html>
 
   function cl
