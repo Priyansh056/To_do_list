@@ -1,5 +1,5 @@
          // Global variables
-        let currentUser = '';
+      /*  let currentUser = '';
         let messages = [];
         let users = [];
         let isTyping = false;
@@ -214,4 +214,4 @@
                 users = JSON.parse(saved);
                 updateOnlineUsers();
             }
-        }
+        } */
